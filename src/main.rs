@@ -1,26 +1,27 @@
 #![no_std]
 #![no_main]
 
-use::core::panic::PanicInfo;
+mod vga_buffer;
+
+use core::panic::PanicInfo;
+use vga_buffer::{Color, VgaWriter};
+use core::fmt::Write;
 
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
     loop {}
 }
 
-static HELLO: &[u8] = b"Hello World!";
-
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
-    // VGA buffer is mapped at 0xb800 in RAM
-    let vga_buffer = 0xb8000 as *mut u8;
+    let mut writer = VgaWriter::new(Color::Green, Color::DarkGray);
+    writer.write_byte(b'H');
+    writer.write_string("ello world\nThis is good\n");
 
-    for (i, &byte) in HELLO.iter().enumerate() {
-        unsafe {
-            *vga_buffer.offset(i as isize * 2) = byte;
-            *vga_buffer.offset(i as isize * 2 + 1) = 0xa;
-        }
-    }
+    write!(writer, "This line calculates {} / {} = {}\n", 1, 3, 1 / 3).unwrap();
+
+    let msg = "OK";
+    println!("This line is from println{} macro, {}", "!", msg);
 
     loop {}
-} 
+}
