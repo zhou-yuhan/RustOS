@@ -61,6 +61,11 @@ impl VgaWriter {
             buffer: unsafe { &mut *(0xb8000 as *mut VgaBuffer) },
         }
     }
+
+    pub fn change_color(&mut self, front: Color, background: Color) {
+        self.color_code = ColorCode::new(front, background);
+    }
+
     pub fn write_byte(&mut self, byte: u8) {
         match byte {
             b'\n' => self.new_line(),
@@ -69,7 +74,7 @@ impl VgaWriter {
                     self.new_line()
                 }
 
-                let row = VGA_BUFFER_H - 1; // TODO: only print bytes at bottom
+                let row = VGA_BUFFER_H - 1;
                 let col = self.col_pos;
                 self.buffer[row][col].write(ScreenCharactor {
                     charactor: byte,
@@ -124,9 +129,8 @@ use lazy_static::lazy_static;
 use spin::Mutex;
 
 lazy_static! {
-    pub static ref VGA_WRITER: Mutex<VgaWriter> = Mutex::new(
-        VgaWriter::new(Color::Green, Color::Black)
-    );
+    pub static ref VGA_WRITER: Mutex<VgaWriter> =
+        Mutex::new(VgaWriter::new(Color::White, Color::Black));
 }
 
 // from std println! source
