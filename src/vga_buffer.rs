@@ -150,3 +150,21 @@ pub fn _print(args: fmt::Arguments) {
     use core::fmt::Write;
     VGA_WRITER.lock().write_fmt(args).unwrap();
 }
+
+#[test_case]
+fn output_test() {
+    println!("First line to be tested");
+    println!(
+        "Test {} + {} = {} and {} / {} = {}",
+        3,
+        2,
+        3 + 2,
+        3,
+        2,
+        3.0 / 2.0
+    );
+    println!("😂🧐🤩");
+    for i in 0x20u8..=0x7eu8 {
+        print!("{}", i as char);
+    }
+}
