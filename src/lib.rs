@@ -26,13 +26,14 @@ fn exit_qemu(code: QemuExit) {
     }
 }
 
+// instances of test cases are defined here
 pub trait Test {
     fn run(&self) -> ();
 }
 
 impl<T: Fn()> Test for T {
     fn run(&self) -> () {
-        println!("running {}...", core::any::type_name::<T>());
+        println!("* running {}...", core::any::type_name::<T>());
         self();
         println!("");
         VGA_WRITER.lock().change_color(Color::Green, Color::Black);
@@ -46,11 +47,15 @@ pub fn test_runner(tests: &[&dyn Test]) {
     for test in tests {
         test.run();
     }
+    // this line would cause qemu to quit without info printed
     // exit_qemu(QemuExit::Success);
 }
 
 pub fn test_panic_handler(_info: &PanicInfo) -> ! {
-    VGA_WRITER.lock().change_color();
+    println!("{}", _info);
+    VGA_WRITER.lock().change_color(Color::Red, Color::Black);
+    println!("[FAILED]");
+    VGA_WRITER.lock().change_color(Color::White, Color::Black);
     loop{}
 }
 

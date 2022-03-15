@@ -168,3 +168,13 @@ fn output_test() {
         print!("{}", i as char);
     }
 }
+
+#[test_case]
+fn vga_correctness() {
+    let s = "This line is tested";
+    println!("{}", s);
+    for (i, ch) in s.chars().enumerate() {
+        let screen_char = VGA_WRITER.lock().buffer[VGA_BUFFER_H-2][i].read().charactor;
+        assert_eq!(screen_char as char, ch);
+    }
+}
